@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   },
   trash: {
     right: -30,
-    bottom: 20,
+    bottom: 10,
     position: "absolute",
     color: "#F9A826",
   },

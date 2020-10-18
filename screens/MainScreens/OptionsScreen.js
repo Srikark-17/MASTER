@@ -3,6 +3,9 @@ import { ActivityIndicator } from 'react-native'
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import Firebasekeys from "../../config";
 import * as firebase from "firebase";
+import { utils } from '@react-native-firebase/app';
+import vision from '@react-native-firebase/ml-vision';
+import ImagePicker from 'react-native-image-picker'
 import "firebase/firestore";
 
 import { FontAwesome5, AntDesign } from "@expo/vector-icons";
@@ -15,7 +18,41 @@ if (!firebase.apps.length) {
 export default function App({navigation}) {
   const [loading, setLoading] = useState(true); // Set loading to true on component mount
   const [users, setUsers] = useState([]); // Initial empty array of users
-
+  let previousText = 'gg '
+  const fetchAnswer = (processedText) => {
+    fetch("http://api.wolframalpha.com/v2/query?appid=6H253Q-YUP5Q62A8Q&input=solve+3x-7%3D11&podstate=Result__Step-by-step%20solution&format=image").then((response) => response.text()).then((textResponse) => {
+            console.log(textResponse);
+         })
+  }
+  const processDocument = async (localPath) => {
+    const processed = await vision().textRecognizerProcessImage(localPath);
+  
+    console.log('Found text in document: ', processed.text);
+  
+    processed.blocks.forEach(block => {
+      console.log('Found block with text: ', block.text);
+      // this.setState({text: this.state.text + block.text, confidence: block.confidence, language: block.recognizedLanguages})
+      console.log('Confidence in block: ', block.confidence);
+      console.log('Languages found in block: ', block.recognizedLanguages);
+      
+    });
+    fetchAnswer(processed.text)
+    navigation.navigate('Problem Results', {computedText: processed.text})
+  }
+  const ChooseImage = () => {
+    // navigation.navigate('Problem Results')
+    const options = {
+      noData: true,
+    };
+    ImagePicker.launchImageLibrary(options, response => {
+      if (response.uri) {
+        // this.setState({ photo: response });
+        console.log(response.uri)
+        processDocument(`${response.uri}`).then(() => console.log('Finished processing file.'));
+        
+      }
+    });
+  }
   useEffect(() => {
     const subscriber = firebase.firestore()
       .collection('Lectures')
@@ -57,12 +94,12 @@ export default function App({navigation}) {
             <Text style={styles.option1Text}>Text</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={()=> navigation.navigate('Problem Results')}>
+        <TouchableOpacity onPress={()=> ChooseImage()}>
           <View style={styles.options2Container}>
           <Image
           source={require("./../../assets/icons8-cameras-96.png")}
         /> 
-            <Text style={styles.option2Text}>Take a</Text>
+            <Text style={styles.option2Text}>Choose a</Text>
             <Text style={styles.option2Text}>Picture</Text>
           </View>
         </TouchableOpacity>

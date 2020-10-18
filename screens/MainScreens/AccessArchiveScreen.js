@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native'
 import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView, FlatList } from "react-native";
+import {AntDesign} from '@expo/vector-icons'
 import Firebasekeys from "../../config";
 import * as firebase from "firebase";
 import "firebase/firestore";
@@ -41,12 +42,20 @@ export default function App({navigation}) {
     <View style={styles.container}>
       <Text style={styles.title}>Access Archive</Text>
       <Text style={styles.subtitle}>Archiving results for</Text>
-      <ScrollView style={{ width: 332, height: 100}}>
+      <ScrollView style={{ width: 332, height: 700, top: 60}}>
         <Image
-            source={require("./../../assets/result.png")}
-            style={{ top: 75,}}
+            source={require("./../../assets/result1.png")}
+            style={{  top: 70, width:318, height:573}}x
           />
         </ScrollView>
+        <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={()=> navigation.navigate('Archived Problems')}>
+        <Image
+          source={require("./../../assets/icons8-back-arrow-100.png")}
+          style={{width: 55, height: 55}}
+        /> 
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -78,6 +87,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlignVertical: "center",
   },
+  buttonContainer: {
+    alignItems: "center",
+    flex: 0.3,
+    padding: 80,
+    top: 10,
+  },
   textInput: {
     height: 65,
     width: 313,
@@ -90,11 +105,27 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     top: 55,
   },
-  buttonContainer: {
-    alignItems: "center",
-    flex: 0.3,
-    padding: 80,
-    top: 30,
+
+  noteContainer: {
+    top: 150,
+    paddingTop: 20,
+    paddingBottom: 40,
+    paddingLeft: 20,
+    paddingRight: 50,
+    backgroundColor: "#ECECEC",
+    borderRadius: 10,
+    marginBottom: 30,
+    width: 300,
+    textAlign: "left",
+    height: 98
+  },
+
+  addNoteContainer: {
+    padding: 10,
+    height: 60,
+    width: 60, //The Width must be the same as the height
+    borderRadius: 100, //Then Make the Border Radius twice the size of width or Height
+    backgroundColor: "#F9A826",
   },
   options1Container: {
     padding: 10,

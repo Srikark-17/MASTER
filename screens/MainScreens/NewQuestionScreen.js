@@ -41,7 +41,8 @@ export default function App({navigation}) {
     <View style={styles.container}>
       <Text style={styles.title}>Enter Your Question</Text>
       <TextInput style={styles.searchBar} placeholder="Type your question" />
-      <Text style={styles.exampleText}>Example Questions:</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('Problem Results', {computedText:''})}><Text style={styles.exampleText}>Example Questions:</Text></TouchableOpacity>
+      
         <View style={styles.noteContainer}>
 
           <Button color={"#8B8B8B"} title={"What is the solution to x if x is an integer below 15 but satisifes the..."} onPress={() => {navigation.navigate('Audio', {
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
     top: 45,
   },
   searchBar: {
-    height: 65,
+    height: 45,
     width: 350,
     borderWidth: 1,
     borderRadius: 45,

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native'
 import { StyleSheet, Text, View, TextInput, FlatList, Button, TouchableOpacity } from "react-native";
 import { AntDesign, MaterialIcons, Entypo } from "@expo/vector-icons";
+import { List, Divider } from 'react-native-paper';
 import Firebasekeys from "../../config";
 import * as firebase from "firebase";
 import "firebase/firestore";
@@ -12,27 +13,34 @@ if (!firebase.apps.length) {
 }
 
 export default function App({navigation}) {
-  const [loading, setLoading] = useState(true); // Set loading to true on component mount
-  const [users, setUsers] = useState([]); // Initial empty array of users
+  const [users, setUsers] = useState([]); 
+  const [threads, setThreads] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const subscriber = firebase.firestore()
-      .collection('Lectures')
-      .onSnapshot(querySnapshot => {
-        const users = [];
-        querySnapshot.forEach(documentSnapshot => {
-          users.push({
+    const unsubscribe = firebase.firestore()
+      .collection('THREADS')
+      .onSnapshot((querySnapshot) => {
+        const threads = querySnapshot.docs.map((documentSnapshot) => {
+          return {
+            _id: documentSnapshot.id,
+            // give defaults
+            name: '',
             ...documentSnapshot.data(),
-            key: documentSnapshot.id,
-          });
+          };
         });
-  
-        setUsers(users);
-        setLoading(false);
+
+        setThreads(threads);
+
+        if (loading) {
+          setLoading(false);
+        }
       });
-  
-    // Unsubscribe from events when no longer in use
-    return () => subscriber();
+
+    /**
+     * unsubscribe listener
+     */
+    return () => unsubscribe();
   }, []);
 
   if (loading) {
@@ -42,21 +50,24 @@ export default function App({navigation}) {
     <View style={styles.container}>
       <Text style={styles.title}>Discussions</Text>
       <TextInput style={styles.searchBar} placeholder="Search discussions" />
-        <View style={styles.noteContainer}>
-
-          <Button color={"#8B8B8B"} title="LOGARITHMS - CHANGE OF..." numberOfLines = { 1 } style={styles.buttonText} onPress={() => {navigation.navigate('Audio', {
-            docName: item.title,
-          });}} />
-          <TouchableOpacity styles={styles.trash}>
+      
+        <FlatList
+          data={threads}
+          keyExtractor={item => item._id}
+          renderItem={({ item }) => (
+            <View style={styles.noteContainer}>
+            <Button color={"#8B8B8B"} title={item.name} numberOfLines = { 3 } style={styles.buttonText} onPress={() => {navigation.navigate('Chat Room', {thread: item })}} />
+            <TouchableOpacity styles={styles.trash} onPress={() => navigation.navigate('Chat Room', { thread: item })}>
             </TouchableOpacity>
-            <TouchableOpacity><MaterialIcons style={styles.people} name="people" size={25} /></TouchableOpacity>
+            <TouchableOpacity><MaterialIcons style={styles.people} name="people" size={20} /></TouchableOpacity>
             <Text style={styles.one}>0</Text>
             <Text style={styles.two}>0</Text>
-            <TouchableOpacity><Entypo style={styles.message} name="chat" size={25} /></TouchableOpacity>
-            <TouchableOpacity><Entypo style={styles.add} name="add-to-list" size={25} /></TouchableOpacity>
-        </View>
+            <TouchableOpacity><Entypo style={styles.message} name="chat" size={20} /></TouchableOpacity>
+            </View>
+          )}
+        />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={()=> navigation.navigate('Start Lecture')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Add Discussion')}>
           <View style={styles.addNoteContainer}>
             <AntDesign style={styles.addNote} name="plus" size={35} />
           </View>
@@ -86,7 +97,7 @@ const styles = StyleSheet.create({
     top: 45,
   },
   searchBar: {
-    height: 65,
+    height: 45,
     width: 350,
     borderWidth: 1,
     borderRadius: 45,
@@ -201,9 +212,10 @@ const styles = StyleSheet.create({
     paddingRight: 50,
     backgroundColor: "#ECECEC",
     borderRadius: 10,
-    marginBottom: 100,
-    width: 350,
-    textAlign: "left"
+    marginBottom: 30,
+    width: 300,
+    textAlign: "left",
+    height: 98
   },
   trash: {
     right: -30,
@@ -212,32 +224,32 @@ const styles = StyleSheet.create({
     color: "#F9A826",
   },
   one: {
-    left: 115,
+    left: 80,
     top: 65,
     position: "absolute",
     color: '#8E8E8E'
   },
   two: {
-    left: 250,
+    left: 225,
     top: 67,
     position: "absolute",
     color: '#8E8E8E'
   },
   people: {
-    left: 200,
+    left: 175,
     bottom: -30,
     position: "absolute",
     color: "#F9A826",
   },
   message: {
-    left: 60,
+    left: 35,
     bottom: -30,
     position: "absolute",
     color: "#F9A826",
   },
   add: {
     left: 280,
-    top: -34,
+    top: -30,
     position: "absolute",
     color: "#F9A826",
   },
